@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from statistics import mean
 
 
 def get_affdex_data():
@@ -66,6 +67,14 @@ def get_affdex_data():
 def get_gsr_data():
     gsr_file = pd.read_csv("input_data/GSRPeakMetrics.csv", header=10)
 
+    # stimmt! mit anderen Werten auch machen
+    signals = gsr_file.loc[:, ['Signal Duration', 'Signal Duration.1', 'Signal Duration.2', 'Signal Duration.3', 'Signal Duration.4', 'Signal Duration.5', 'Signal Duration.6', 'Signal Duration.7', 'Signal Duration.8']].mean(axis=1)
+    print(signals)
+
+    #signals = (gsr_file['Signal Duration'] + gsr_file['Signal Duration.1'] + gsr_file['Signal Duration.2'] + gsr_file['Signal Duration.3'] + gsr_file['Signal Duration.4'] + gsr_file['Signal Duration.5'] + gsr_file['Signal Duration.6'] + gsr_file['Signal Duration.7'] + gsr_file['Signal Duration.8']).tolist()
+    #print(gsr_file['Signal Duration.1'] + gsr_file['Signal Duration.2'])
+
+    #print ("resps: " + resps)
     respondent_name_column = gsr_file['Respondent Name'].tolist()
     signal_duration_column = gsr_file['Signal Duration'].tolist()
     has_peaks_column = gsr_file['Has Peaks'].tolist()
@@ -115,7 +124,9 @@ def check(affdex_dict, gsr_dict):
 if __name__ == '__main__':
     affdex_dict = get_affdex_data()
     gsr_dict = get_gsr_data()
+    print(gsr_dict["Signal Duration"])
     check(affdex_dict, gsr_dict)
+    print(gsr_dict["Signal Duration"])
     create_output(affdex_dict, gsr_dict)
 
 
