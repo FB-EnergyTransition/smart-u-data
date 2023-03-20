@@ -1,8 +1,10 @@
 import pandas as pd
+import numpy as np
 
 
 def get_affdex_data():
     affdex_file = pd.read_csv("input_data/AFFDEX_Statistics.csv", header=4)
+
     study_name_column = affdex_file['Study Name'].tolist()
     respondent_name_column = affdex_file['Respondent Name'].tolist()
     gender_column = affdex_file['Gender'].tolist()
@@ -57,20 +59,63 @@ def get_affdex_data():
             "Brow Furrow Time Percentage": brow_furrow_column,
             "Smile Time Percentage": smile_column,
             "Sentimentality Time Percentage": sentimentality_column,
-            "Confusion Time Percentage": confusion_column}
+            "Confusion Time Percentage": confusion_column
+            }
 
 
 def get_gsr_data():
-    gsr_file = pd.read_csv("input_data/GSRPeakMetrics.csv")
+    gsr_file = pd.read_csv("input_data/GSRPeakMetrics.csv", header=10)
+
+    respondent_name_column = gsr_file['Respondent Name'].tolist()
+    signal_duration_column = gsr_file['Signal Duration'].tolist()
+    has_peaks_column = gsr_file['Has Peaks'].tolist()
+    peak_count_column = gsr_file['Peak Count'].tolist()
+    peaks_per_minute_column = gsr_file['Peaks Per Minute'].tolist()
+    average_peak_column = gsr_file['Average Peak Amplitude'].tolist()
+
+    return {"Respondent Name": respondent_name_column,
+            "Signal Duration": signal_duration_column,
+            "Has Peaks": has_peaks_column,
+            "Peak Count": peak_count_column,
+            "Peaks Per Minute": peaks_per_minute_column,
+            "Average Peak Amplitude": average_peak_column
+            }
 
 
-def create_output(affdex_dict):
+def create_output(affdex_dict, gsr_dict):
+
+    affdex_dict.update(gsr_dict)
+    #for key in affdex_dict:
+        #print(len(affdex_dict[key]))
     df = pd.DataFrame(data=affdex_dict)
     df.to_excel("output.xlsx", index=False)
 
 
+def check(affdex_dict, gsr_dict):
+    resp_affex = affdex_dict["Respondent Name"]
+    resp_gsr = gsr_dict["Respondent Name"]
+
+    for i in range(0, len(resp_affex)):
+        if resp_affex[i] != resp_gsr[i]:
+            print(i)
+            print(resp_affex[i])
+            count = resp_affex.count(resp_affex[i])
+            print(count)
+            for j in range(0, count):
+                resp_gsr.insert(i+j, resp_affex[i])
+                gsr_dict["Signal Duration"].insert(i+j, np.nan)
+                gsr_dict["Has Peaks"].insert(i+j, np.nan)
+                gsr_dict["Peak Count"].insert(i+j, np.nan)
+                gsr_dict["Peaks Per Minute"].insert(i+j, np.nan)
+                gsr_dict["Average Peak Amplitude"].insert(i+j, np.nan)
+            print(gsr_dict)
+            break
+
+
 if __name__ == '__main__':
     affdex_dict = get_affdex_data()
-    create_output(affdex_dict)
+    gsr_dict = get_gsr_data()
+    check(affdex_dict, gsr_dict)
+    create_output(affdex_dict, gsr_dict)
 
 
