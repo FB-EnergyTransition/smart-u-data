@@ -68,26 +68,40 @@ def get_gsr_data():
     gsr_file = pd.read_csv("input_data/GSRPeakMetrics.csv", header=10)
 
     # stimmt! mit anderen Werten auch machen
-    signals = gsr_file.loc[:, ['Signal Duration', 'Signal Duration.1', 'Signal Duration.2', 'Signal Duration.3', 'Signal Duration.4', 'Signal Duration.5', 'Signal Duration.6', 'Signal Duration.7', 'Signal Duration.8']].mean(axis=1)
-    print(signals)
+    signal_duration = gsr_file.loc[:, ['Signal Duration', 'Signal Duration.1', 'Signal Duration.2', 'Signal Duration.3',
+                                       'Signal Duration.4', 'Signal Duration.5', 'Signal Duration.6', 'Signal Duration.7',
+                                       'Signal Duration.8']].mean(axis=1)
+    #print(signal_duration)
 
-    #signals = (gsr_file['Signal Duration'] + gsr_file['Signal Duration.1'] + gsr_file['Signal Duration.2'] + gsr_file['Signal Duration.3'] + gsr_file['Signal Duration.4'] + gsr_file['Signal Duration.5'] + gsr_file['Signal Duration.6'] + gsr_file['Signal Duration.7'] + gsr_file['Signal Duration.8']).tolist()
-    #print(gsr_file['Signal Duration.1'] + gsr_file['Signal Duration.2'])
+    has_peaks = gsr_file.loc[:, ['Has Peaks', 'Has Peaks.1', 'Has Peaks.2', 'Has Peaks.3',
+                                       'Has Peaks.4', 'Has Peaks.5', 'Has Peaks.6',
+                                       'Has Peaks.7',
+                                       'Has Peaks.8']].mean(axis=1)
+    #print(has_peaks)
 
-    #print ("resps: " + resps)
+    peak_count = gsr_file.loc[:, ['Peak Count', 'Peak Count.1', 'Peak Count.2', 'Peak Count.3',
+                                       'Peak Count.4', 'Peak Count.5', 'Peak Count.6',
+                                       'Peak Count.7',
+                                       'Peak Count.8']].mean(axis=1)
+
+    peaks_per_minute = gsr_file.loc[:, ['Peaks Per Minute', 'Peaks Per Minute.1', 'Peaks Per Minute.2', 'Peaks Per Minute.3',
+                                       'Peaks Per Minute.4', 'Peaks Per Minute.5', 'Peaks Per Minute.6',
+                                       'Peaks Per Minute.7',
+                                       'Peaks Per Minute.8']].mean(axis=1)
+
+    average_peak_amplitude = gsr_file.loc[:, ['Average Peak Amplitude', 'Average Peak Amplitude.1', 'Average Peak Amplitude.2', 'Average Peak Amplitude.3',
+                                       'Average Peak Amplitude.4', 'Average Peak Amplitude.5', 'Average Peak Amplitude.6',
+                                       'Average Peak Amplitude.7',
+                                       'Average Peak Amplitude.8']].mean(axis=1)
+
     respondent_name_column = gsr_file['Respondent Name'].tolist()
-    signal_duration_column = gsr_file['Signal Duration'].tolist()
-    has_peaks_column = gsr_file['Has Peaks'].tolist()
-    peak_count_column = gsr_file['Peak Count'].tolist()
-    peaks_per_minute_column = gsr_file['Peaks Per Minute'].tolist()
-    average_peak_column = gsr_file['Average Peak Amplitude'].tolist()
 
     return {"Respondent Name": respondent_name_column,
-            "Signal Duration": signal_duration_column,
-            "Has Peaks": has_peaks_column,
-            "Peak Count": peak_count_column,
-            "Peaks Per Minute": peaks_per_minute_column,
-            "Average Peak Amplitude": average_peak_column
+            "Signal Duration": signal_duration.tolist(),
+            "Has Peaks": has_peaks.tolist(),
+            "Peak Count": peak_count.tolist(),
+            "Peaks Per Minute": peaks_per_minute.tolist(),
+            "Average Peak Amplitude": average_peak_amplitude.tolist()
             }
 
 
@@ -100,16 +114,14 @@ def create_output(affdex_dict, gsr_dict):
     df.to_excel("output.xlsx", index=False)
 
 
-def check(affdex_dict, gsr_dict):
+def check_completeness(affdex_dict, gsr_dict):
     resp_affex = affdex_dict["Respondent Name"]
     resp_gsr = gsr_dict["Respondent Name"]
 
     for i in range(0, len(resp_affex)):
         if resp_affex[i] != resp_gsr[i]:
-            print(i)
-            print(resp_affex[i])
+
             count = resp_affex.count(resp_affex[i])
-            print(count)
             for j in range(0, count):
                 resp_gsr.insert(i+j, resp_affex[i])
                 gsr_dict["Signal Duration"].insert(i+j, np.nan)
@@ -117,16 +129,13 @@ def check(affdex_dict, gsr_dict):
                 gsr_dict["Peak Count"].insert(i+j, np.nan)
                 gsr_dict["Peaks Per Minute"].insert(i+j, np.nan)
                 gsr_dict["Average Peak Amplitude"].insert(i+j, np.nan)
-            print(gsr_dict)
             break
 
 
 if __name__ == '__main__':
     affdex_dict = get_affdex_data()
     gsr_dict = get_gsr_data()
-    print(gsr_dict["Signal Duration"])
-    check(affdex_dict, gsr_dict)
-    print(gsr_dict["Signal Duration"])
+    check_completeness(affdex_dict, gsr_dict)
     create_output(affdex_dict, gsr_dict)
 
 
