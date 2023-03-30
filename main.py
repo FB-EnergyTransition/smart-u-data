@@ -16,7 +16,6 @@ def process_cli_arguments():
 
 def get_affdex_data(affdex_file):
     affdex = pd.read_csv(affdex_file, header=4)
-    print(affdex.columns)
 
     study_name_column = affdex['Study Name'].tolist()
     respondent_name_column = affdex['Respondent Name'].tolist()
@@ -150,6 +149,8 @@ def check_completeness(affdex_dict, gsr_dict):
 
 if __name__ == '__main__':
     args = process_cli_arguments()
+    print("AFFDEX file: " + args.affdex_file)
+    print("GSR file: " + args.gsr_file)
     affdex_dict = get_affdex_data(args.affdex_file)
     gsr_dict = get_gsr_data(args.gsr_file)
     check_completeness(affdex_dict, gsr_dict)
